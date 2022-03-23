@@ -6,7 +6,19 @@
   <script type="text/javascript" src="https://www.cornify.com/js/cornify.js"></script>
 </head>
 <body>
-<script>
-</script>
+  <script>
+    const pressed = [];
+    const secretMsg = 'ofekgotabigdick';
+
+    window.addEventListener('keyup', (e) => {
+      pressed.push(e.key)
+      pressed.splice(-secretMsg.length - 1, pressed.length - secretMsg.length)
+
+      if(pressed.join('') === secretMsg) {
+        console.log('Thats right Ma boi');
+        cornify_add();
+      }
+    })
+  </script>
 </body>
 </html>

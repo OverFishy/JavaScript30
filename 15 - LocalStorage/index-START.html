@@ -23,12 +23,19 @@
       <input type="text" name="item" placeholder="Item Name" required>
       <input type="submit" value="+ Add Item">
     </form>
+    <div class="selection-btns">
+      <button data-btn="check" class="btn">Check All</button>
+      <button data-btn="clear" class="btn">Clear All</button>
+      <button data-btn="delete" class="btn">Delete All</button>
+    </div>
   </div>
 
 <script>
   const addItems = document.querySelector('.add-items');
   const itemsList = document.querySelector('.plates');
-  const items = JSON.parse(localStorage.getItem('items')) || [];
+  let items = JSON.parse(localStorage.getItem('items')) || [];
+  const toggleBtns = document.querySelector('.selection-btns');
+  const deleteBtn = toggleBtns.querySelector('[data-btn=delete]')
 
   function addItem(e) {
     e.preventDefault();
@@ -52,7 +59,6 @@
         </li>
       `
     }).join('');
-    console.log(plateList);
   }
 
   function toggleDone(e) {
@@ -64,8 +70,33 @@
     populateList(items, itemsList)
   };
 
+  function toggleChecked(e) {
+    if(e.target.matches('div') || e.target.matches('[data-btn=delete]')) return;
+    if(e.target.matches('[data-btn=check]')) {
+      items.forEach(item => {
+        item.done = true
+      });
+    } else {
+      items.forEach(item => {
+        item.done = false
+      });
+    }
+    localStorage.setItem('items', JSON.stringify(items));
+    populateList(items, itemsList)
+  };
+
+  function deleteAll(e) {
+    console.log(e.target)
+    itemsList.innerHTML = ``;
+    items = [];
+    console.table(items)
+    localStorage.setItem('items', JSON.stringify(items));
+  }
+
   addItems.addEventListener('submit', addItem)
   itemsList.addEventListener('click', toggleDone)
+  toggleBtns.addEventListener('click', toggleChecked)
+  deleteBtn.addEventListener('click', deleteAll)
 
   populateList(items, itemsList)
 </script>

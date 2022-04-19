@@ -10,8 +10,75 @@
   </div>
 
 <script>
+
+// Weather API elements
+  const apiKey = "9e3401b8f5c100022079d4ee02625a9b";
+  const inputVal = "israel"
+  const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
+
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  const recognition = new SpeechRecognition();
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  let p = document.createElement('p');
+  const words = document.querySelector('.words');
+  words.appendChild(p);
+
+  function debounce(func, timeout = 4000) {
+    let shouldInvoke = true
+    return () => {
+      if(!shouldInvoke) return;
+      func()
+      shouldInvoke = false
+      setTimeout(() => {shouldInvoke = true}, 4000)
+    }
+  }
+
+  // Activating Debouncer on methods
+  const weatherDebounced = debounce(getTheWeather);
+
+  // Active methods
+  function getTheWeather() {
+
+    fetch(weatherURL)
+        .then(response => response.json())
+        .then(data => {
+          const { main, name, sys, weather } = data;
+          console.log(`the weather in ${name},${sys.country} is ${Math.round(main.temp)} °C`)
+        })
+  }
+
+  recognition.addEventListener('result', e => {
+    const transcript = Array.from(e.results)
+      .map(result => result[0])
+      .map(result => result.transcript)
+      .join('');
+
+    const transcriptWithEmojis = transcript
+      .replace(/poop|poo|shit|dump/gi, '💩')
+      .replace(/angry|mad/gi, '😡')
+      .replace(/cool/gi, '😎')
+      .replace(/robot/gi, '🤖')
+      .replace(/sushi/gi, '🍣')
+
+    p.textContent = transcriptWithEmojis;
+
+    if (e.results[0].isFinal) {
+      p = document.createElement('p');
+      words.appendChild(p);
+    }
+
+    if (transcript.includes('weather')) {
+     weatherDebounced();
+    }
+
+  });
+
+recognition.addEventListener('end', recognition.start);
+
+recognition.start();
 
 </script>
 
@@ -40,7 +107,7 @@
       position: relative;
       line-height: 3rem;
     }
-    
+
     p {
       margin: 0 0 3rem;
     }
@@ -59,3 +126,46 @@
 
 </body>
 </html>
+
+
+<!-- ARCHIVE -->
+
+<!-- Hebrew Version -->
+<!-- // window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// const recognition = new SpeechRecognition();
+// recognition.interimResults = true;
+// recognition.lang = 'iw-IL';
+
+// let p = document.createElement('p');
+// const words = document.querySelector('.words');
+// words.appendChild(p);
+
+// recognition.addEventListener('result', e => {
+//   const transcript = Array.from(e.results)
+//     .map(result => result[0])
+//     .map(result => result.transcript)
+//     .join('');
+
+//     const modifiyTranscript = transcript.replace(/כועס|עצבני/gi, '😡');
+//     p.textContent = modifiyTranscript;
+
+//     p.textContent = transcript
+//     if (e.results[0].isFinal) {
+//       p = document.createElement('p');
+//       words.appendChild(p);
+//     }
+
+//     console.log(transcript);
+//     if (transcript.includes('מזג האוויר')) {
+//       p = document.createElement('p');
+//       console.log('Checking weather')
+//       words.appendChild(p);
+//     }
+
+    // if(transcript.includes('מזג האוויר')) {
+    //   console.log('Checking weather')
+    // }
+// });
+// recognition.addEventListener('end', recognition.start)
+// recognition.start(); -->

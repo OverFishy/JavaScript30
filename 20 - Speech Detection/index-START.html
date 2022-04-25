@@ -11,10 +11,12 @@
 
 <script>
 
-// Weather API elements
+// Weather API key
   const apiKey = "9e3401b8f5c100022079d4ee02625a9b";
-  const inputVal = "israel"
-  const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
+  let inputVal
+
+// Kanye API
+  knayeURL = 'https://api.kanye.rest/'
 
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -38,15 +40,34 @@
 
   // Activating Debouncer on methods
   const weatherDebounced = debounce(getTheWeather);
+  const kanyeDebounced = debounce(kanyeSay)
 
   // Active methods
+  function kanyeSay() {
+    fetch(knayeURL)
+        .then(response => response.json())
+        .then(data => {
+          const kanyeQuete = document.createElement('div');
+          kanyeQuete.textContent = `Kanya said: '${data['quote']}'`;
+          kanyeQuete.classList.add('input');
+          words.appendChild(kanyeQuete)
+        })
+  }
+
   function getTheWeather() {
+
+    // weather API elements
+
+    const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
 
     fetch(weatherURL)
         .then(response => response.json())
         .then(data => {
           const { main, name, sys, weather } = data;
-          console.log(`the weather in ${name},${sys.country} is ${Math.round(main.temp)} °C`)
+          const weatherForcast = document.createElement('div');
+          weatherForcast.textContent = `the weather in ${name},${sys.country} is ${Math.round(main.temp)} °C`
+          weatherForcast.classList.add('input');
+          words.appendChild(weatherForcast)
         })
   }
 
@@ -70,10 +91,15 @@
       words.appendChild(p);
     }
 
-    if (transcript.includes('weather')) {
-     weatherDebounced();
+    if ((/what(\sis|\'s)\sthe\sweather\sin\s\w*/gm).test(transcript) &&
+        (e.results[0].isFinal)) {
+          inputVal = transcript.split(' ').pop(); // Getting the last word (which should be a city)
+          weatherDebounced();
     }
 
+    if (transcript.includes('what would Kanye say')) {
+      kanyeDebounced();
+    }
   });
 
 recognition.addEventListener('end', recognition.start);
@@ -122,6 +148,12 @@ recognition.start();
       border: 1px solid;
       border-color: transparent #efe4e4;
     }
+
+    .input {
+      border: 1px solid #f4b7b7;
+      border-radius: 10px;
+    }
+
   </style>
 
 </body>

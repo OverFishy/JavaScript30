@@ -15,6 +15,43 @@
   </div>
 
 <script>
+  const speed = document.querySelector('.speed');
+  const bar = speed.querySelector('.speed-bar');
+  const video = document.querySelector('.flex');
+
+  const MAX = 4;
+  const MIN = 0.4;
+
+  speed.addEventListener('mousemove', function (e) {
+    this.offsetBottom = this.offsetTop + this.offsetHeight // define offsetBottom
+    const mouseOnBarValue = e.pageY - this.offsetTop;
+
+    if (e.pageY < 400) {
+      // if the mouse is on the top part of the bar
+      // if the mouse location on the bar value is smaller then the actuall bar value, swap with 0 (avoid negative values)
+      y = e.pageY < this.offsetTop ? 0 : mouseOnBarValue;
+    } else {
+      // if the mouse is on the bottom part of the bar
+      // if the mouse location on the bar value is at it's max range,
+      // assign it with "max" that will later be considered as a full bar
+      y = this.offsetBottom === e.pageY + 1 ? 'max' : mouseOnBarValue
+    }
+
+    // how much of the bar is filled 0 - 1
+    if (y === 'max') {
+      precentage = 1
+    } else {
+      precentage = y / this.offsetHeight
+    }
+
+    heightPrecentage = Math.floor((precentage * 100)) + '%' // how much of the bar is filled 0% - 100%
+    bar.style.height = heightPrecentage;
+
+    const playBackRate = precentage * (MAX - MIN) + MIN;
+    bar.textContent = playBackRate.toFixed(2) + '×';
+    video.playbackRate = playBackRate;
+  })
+
 </script>
 </body>
 </html>
